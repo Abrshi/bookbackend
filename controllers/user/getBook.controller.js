@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+const baseurl = process.env.PORT;
 
 
 export const getBookList = async (req, res) => {
@@ -45,7 +46,7 @@ export const serchedBook = async (req, res) => {
     console.log("Params received:", params);
     const booksWithProxyCover = books.map((book) => {
       if (book.coverUrl) {
-          book.coverUrl   ?book.coverUrl = `http://localhost:5500/api/v1/google-image/${book.coverUrl}`
+          book.coverUrl   ?book.coverUrl = `${baseurl}/api/v1/google-image/${book.coverUrl}`
           : null;
       }
       if (book.fileUrl) {

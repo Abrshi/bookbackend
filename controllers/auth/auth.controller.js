@@ -21,18 +21,33 @@ const hashToken = (token) =>
   crypto.createHash("sha256").update(token).digest("hex");
 
 // ---------------- Cookie Options ----------------
+// const accessCookieOptions = {
+//   httpOnly: true,
+//   secure: process.env.NODE_ENV === "production",
+//   sameSite: "none",
+//   maxAge: 5 * 60 * 1000, // 5 minutes
+// };
+
+// const refreshCookieOptions = {
+//   httpOnly: true,
+//   secure: process.env.NODE_ENV === "production",
+//   sameSite: "none",
+//   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+// };
 const accessCookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: true,     // <- ALWAYS true on Render
   sameSite: "none",
-  maxAge: 5 * 60 * 1000, // 5 minutes
+  path: "/",        // add this
+  maxAge: 5 * 60 * 1000
 };
 
 const refreshCookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: true,
   sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  path: "/",        // add this
+  maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
 
