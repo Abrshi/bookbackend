@@ -1,0 +1,10 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+# Ignore leaked Google Cloud credentials
+final-project-455209-3941f974a570.json
+final-project-455209-3941f974a570 (1).json
+uploads/
