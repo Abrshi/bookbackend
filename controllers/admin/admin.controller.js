@@ -6,9 +6,8 @@ const prisma = new PrismaClient();
 
 export const addBookCatagory = async (req, res) => {
   const { catagory } = req.body;
-
   if (!catagory)
-    return res.status(400).json({ error: "category is required" });
+    return res.status(400).json({ error: "categoryis required" });
 
   try {
     const existing = await prisma.category.findFirst({
