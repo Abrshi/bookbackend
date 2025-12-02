@@ -58,7 +58,7 @@ app.use("/api/v1/auth", authRouter);
 
 app.use("/api/v1/admin", adminRouter);
 
-// user routes
+// user 
 app.use("/api/v1/user",authMiddleware, user);
 
 // Google Drive image proxy (top-level path under /api/v1)
