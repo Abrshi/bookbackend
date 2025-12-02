@@ -39,7 +39,7 @@ const accessCookieOptions = {
   secure: true,     // <- ALWAYS true on Render
   sameSite: "none",
   path: "/",        // add this
-  maxAge: 5 * 60 * 1000
+  maxAge: 24 * 60 * 60 * 1000
 };
 
 const refreshCookieOptions = {
