@@ -7,7 +7,7 @@ import { log } from "console";
 const prisma = new PrismaClient();
 
 // ---------------- Token Helpers ----------------
-const generateAccessToken = (user) =>
+export const generateAccessToken = (user) =>
   jwt.sign(
     { userId: user.id, role: user.role },
     process.env.JWT_SECRET,
@@ -39,7 +39,7 @@ const accessCookieOptions = {
   secure: true,     // <- ALWAYS true on Render
   sameSite: "none",
   path: "/",        // add this
-  maxAge: 24 * 60 * 60 * 1000
+  maxAge:60 * 60 * 1000
 };
 
 const refreshCookieOptions = {
@@ -109,7 +109,7 @@ export const signIn = async (req, res) => {
     const accessToken = generateAccessToken(user);
 
     const refreshToken = generateRefreshToken();
-    const hashedRefreshToken = hashToken(refreshToken);
+    const hashedRefreshToken =refreshToken; //i removed hash function to match stored token
 
     await prisma.session.create({
       data: { userId: user.id, refreshToken: hashedRefreshToken },
@@ -127,12 +127,10 @@ export const signIn = async (req, res) => {
           role: user.role
         }
       });
-
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
 };
-
 
 //----------------- Get Current User ----------------
 export const getMe = async (req, res) => {
@@ -140,8 +138,7 @@ export const getMe = async (req, res) => {
     const token = req.cookies.refreshToken;
     if (!token) return res.status(401).json({ error: "No token provided" });
 
-    const hashedToken = hashToken(token);
-
+    const hashedToken =token; //i removed hash function to match stored token 
     const session = await prisma.session.findFirst({
       where: { refreshToken: hashedToken },
       include: { user: true }

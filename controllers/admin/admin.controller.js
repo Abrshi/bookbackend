@@ -163,3 +163,23 @@ export const addBook = async (req, res) => {
   }
 };
 
+export const getUserList = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        // passwordHash: false  // not needed when using select
+      },
+    });
+
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: "Internal server error while fetching users" });
+  }
+};

@@ -16,6 +16,7 @@ import adminRouter from './routes/admin/admin.rout.js';
 
 import user from './routes/user/user.rout.js';
 import { authMiddleware } from "./middlewares/auth.middlewares.js";
+import { verifyAdmin } from "./middlewares/admin.middlewares.js";
 // middleware
 //routs
 
@@ -56,7 +57,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRouter);
 // admin routes
 
-app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/admin",verifyAdmin , adminRouter);
 
 // user 
 app.use("/api/v1/user",authMiddleware, user);

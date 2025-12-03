@@ -4,13 +4,17 @@ import {
   addBookCatagory,
   deleteBookCategory,
   getAllBookCatagories,
+  getUserList,
   updateBookCategory
 } from "../../controllers/admin/admin.controller.js";
 
 import { upload } from "../../middlewares/upload.js";
 
 const router = express.Router();
+// user
+router.get("/getUserList", getUserList);
 
+// 
 router.post("/addbookcatagory", addBookCatagory);
 router.get("/getAllBookCatagories", getAllBookCatagories);
 

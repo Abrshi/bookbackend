@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
+import { generateAccessToken } from "../controllers/auth/auth.controller.js";
+
+const prisma = new PrismaClient();
 
 export const authMiddleware = async (req, res, next) => {
-  // ------------------------------
-  // 1. Extract tokens
-  // ------------------------------
-  const refreshToken =
+  const refreshTokenReceived =
     req.cookies?.refreshToken ||
     (req.headers?.refreshtoken?.startsWith("Bearer ")
       ? req.headers.refreshtoken.split(" ")[1]
@@ -16,9 +17,6 @@ export const authMiddleware = async (req, res, next) => {
       ? req.headers.authorization.split(" ")[1]
       : null);
 
-  // ------------------------------
-  // 2. If access token exists → verify normally
-  // ------------------------------
   if (accessToken) {
     try {
       const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
@@ -29,41 +27,45 @@ export const authMiddleware = async (req, res, next) => {
     }
   }
 
-  // ------------------------------
-  // 3. Access token missing or expired → check refresh token
-  // ------------------------------
-  if (!refreshToken) {
-    console.log("❌ No tokens provided at all");
+  if (!refreshTokenReceived) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-    console.log("Refresh token valid, issuing new access token" , process.env.REFRESH_TOKEN_SECRET);
-    const decodedRefresh = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    console.log("Decoded Refresh Token:", decodedRefresh);
-    // ------------------------------
-    // 4. Create a new access token
-    // ------------------------------
-    const newAccessToken = jwt.sign(
-      { id: decodedRefresh.id, email: decodedRefresh.email, role: decodedRefresh.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "5m" }
-    );
-
-    console.log("🔄 New access token issued");
-
-    // Send new access token as cookie
-    res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
-      sameSite: "none",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 5 * 60 * 1000,
+    const session = await prisma.session.findFirst({
+      where: { refreshToken: refreshTokenReceived },
     });
 
-    req.user = decodedRefresh; // user info from refresh token
-    return next();
+    if (!session) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+      select: { id: true, role: true, fullName: true, email: true },
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    const newAccessToken = generateAccessToken(user);
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      path: "/",
+      maxAge:60 * 60 * 1000,
+    });
+
+    req.user = { id: user.id, role: user.role }; // attach to request
+    console.log("🔄 New access token issued from refresh token");
+
+    next(); // continue to next middleware/route
   } catch (err) {
     console.log("⛔ Invalid refresh token:", err.message);
     return res.status(401).json({ error: "Invalid refresh token" });
   }
 };
+
