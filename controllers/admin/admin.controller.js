@@ -47,6 +47,66 @@ export const getAllBookCatagories = async (req, res) => {
   }
 };
 
+export const deleteBookCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    if (!id) {
+      return res.status(400).json({ error: "Category ID is required" });
+    }
+    const deleted = await prisma.category.delete({
+      where: { id: Number(id) },
+    });
+    return res.status(200).json({
+      message: "Category deleted successfully",
+      deleted,
+    });
+  } catch (err) {
+    console.error("Error deleting category:", err);
+
+    if (err.code === "P2025") {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    return res.status(500).json({
+      error: "Internal server error while deleting category",
+    });
+  }
+};
+export const updateBookCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { category } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: "Category ID is required" });
+    }
+
+    if (!category || category.trim() === "") {
+      return res.status(400).json({ error: "Category name cannot be empty" });
+    }
+
+    const updated = await prisma.category.update({
+      where: { id: Number(id) },
+      data: { category },
+    });
+
+    return res.status(200).json({
+      message: "Category updated successfully",
+      updated,
+    });
+  } catch (err) {
+    console.error("Error updating category:", err);
+
+    if (err.code === "P2025") {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    return res.status(500).json({
+      error: "Internal server error while updating category",
+    });
+  }
+};
 
 export const addBook = async (req, res) => {
   try {

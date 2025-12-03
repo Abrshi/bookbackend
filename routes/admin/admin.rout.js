@@ -2,7 +2,9 @@ import express from "express";
 import {
   addBook,
   addBookCatagory,
-  getAllBookCatagories
+  deleteBookCategory,
+  getAllBookCatagories,
+  updateBookCategory
 } from "../../controllers/admin/admin.controller.js";
 
 import { upload } from "../../middlewares/upload.js";
@@ -10,7 +12,11 @@ import { upload } from "../../middlewares/upload.js";
 const router = express.Router();
 
 router.post("/addbookcatagory", addBookCatagory);
-router.get("/getallbookcatagories", getAllBookCatagories);
+router.get("/getAllBookCatagories", getAllBookCatagories);
+
+// FIXED (removed extra /admin)
+router.delete("/deleteBookCategory/:id", deleteBookCategory);
+router.put("/updateBookCategory/:id", updateBookCategory);
 
 router.post(
   "/addbook",
@@ -22,4 +28,3 @@ router.post(
 );
 
 export default router;
- 
