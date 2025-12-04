@@ -61,3 +61,35 @@ export const serchedBook = async (req, res) => {
     res.status(500).json({ error: "Internal server error while fetching books" });
   }
 };
+
+// get hero books
+export const getAllHeroes = async (req, res) => {
+  try {
+    const heroes = await prisma.hero.findMany({
+      include: { book: true },
+    });
+
+    const heroesWithUpdatedBooks = heroes.map((hero) => {
+      const updatedBook = { ...hero.book };
+
+      if (updatedBook.coverUrl) {
+        updatedBook.coverUrl = `${baseurl}/api/v1/google-image/${updatedBook.coverUrl}`;
+      }
+      if (updatedBook.fileUrl) {
+        updatedBook.fileUrl = `https://drive.google.com/file/d/${updatedBook.fileUrl}/edit`;
+      }
+
+      return {
+        ...hero,
+        book: updatedBook,
+      };
+    });
+
+    res.status(200).json(heroesWithUpdatedBooks);
+  } catch (err) {
+    console.error("Error fetching heroes:", err);
+    res
+      .status(500)
+      .json({ error: "Internal server error while fetching heroes" });
+  }
+};

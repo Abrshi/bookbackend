@@ -36,7 +36,6 @@ export const addBookCatagory = async (req, res) => {
   }
 };
 
-
 export const getAllBookCatagories = async (req, res) => {
   try {
     const categories = await prisma.category.findMany();
@@ -73,6 +72,7 @@ export const deleteBookCategory = async (req, res) => {
     });
   }
 };
+
 export const updateBookCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -182,4 +182,78 @@ export const getUserList = async (req, res) => {
     console.error("Error fetching users:", err);
     res.status(500).json({ error: "Internal server error while fetching users" });
   }
+};
+
+export const getAllBook = async (req, res) => {
+  try {
+    const books = await prisma.book.findMany();
+    res.status(200).json(books);
+  } catch (err) {
+    console.error("Error fetching books:", err);
+    res.status(500).json({ error: "Internal server error while fetching books" });
+  }
+};
+
+export const addHero = async (req, res) => {
+  try {
+    const { id } = req.body;  // use bookId instead of id
+     const bookId=id;
+    if (!bookId) return res.status(400).json({ error: "bookId is required" });
+
+    const book = await prisma.book.findUnique({ where: { id: Number(bookId) } });
+    if (!book) return res.status(404).json({ error: "Book not found" });
+
+    const heroExists = await prisma.hero.findFirst({ where: { bookId: Number(bookId) } });
+    if (heroExists) return res.status(409).json({ error: "This book is already a hero" });
+
+    const newHero = await prisma.hero.create({
+      data: { book: { connect: { id: Number(bookId) } } },
+    });
+
+    return res.status(201).json({
+      message: "Hero added successfully",
+      hero: newHero,
+    });
+
+  } catch (err) {
+    console.error("Error adding hero:", err);
+    return res.status(500).json({ error: "Internal server error while adding hero" });
+  }
+};
+
+
+export const getAllHeroes = async (req, res) => {
+  try {
+    const heroes = await prisma.hero.findMany({
+      include: { book: true },
+    });
+    res.status(200).json(heroes);
+  }
+    catch (err) {
+    console.error("Error fetching heroes:", err);
+    res.status(500).json({ error: "Internal server error while fetching heroes" });
+  }
+};
+export const deleteHero = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "Hero ID is required" });
+    }
+    const deleted = await prisma.hero.delete({
+      where: { id: Number(id) },
+    });
+    return res.status(200).json({
+      message: "Hero deleted successfully",
+      deleted,
+    });
+  } catch (err) {
+    console.error("Error deleting hero:", err);
+    if (err.code === "P2025") {
+      return res.status(404).json({ error: "Hero not found" });
+    }
+    return res.status(500).json({
+      error: "Internal server error while deleting hero",
+    });
+  } 
 };

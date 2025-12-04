@@ -51,6 +51,14 @@ CREATE TABLE "Book" (
     CONSTRAINT "Book_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Hero" (
+    "id" SERIAL NOT NULL,
+    "bookId" INTEGER NOT NULL,
+
+    CONSTRAINT "Hero_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -59,3 +67,6 @@ ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "Book" ADD CONSTRAINT "Book_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Hero" ADD CONSTRAINT "Hero_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

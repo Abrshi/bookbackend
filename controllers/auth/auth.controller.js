@@ -36,7 +36,7 @@ const hashToken = (token) =>
 // };
 const accessCookieOptions = {
   httpOnly: true,
-  secure: true,     // <- ALWAYS true on Render
+  secure: true,     
   sameSite: "none",
   path: "/",        // add this
   maxAge:60 * 60 * 1000

@@ -22,7 +22,6 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
-
 model Session {
   id           Int      @id @default(autoincrement())
   user         User     @relation(fields: [userId], references: [id])
@@ -50,4 +49,12 @@ model Book {
   publishedAt  DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  
+  heroes       Hero[] 
 }
+model Hero {
+  id      Int   @id @default(autoincrement())
+  bookId  Int
+  book    Book  @relation(fields: [bookId], references: [id])
+}
+
