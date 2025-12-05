@@ -65,9 +65,11 @@ export const serchedBook = async (req, res) => {
 // get hero books
 export const getAllHeroes = async (req, res) => {
   try {
+
     const heroes = await prisma.hero.findMany({
       include: { book: true },
     });
+    console.log(heroes)
 
     const heroesWithUpdatedBooks = heroes.map((hero) => {
       const updatedBook = { ...hero.book };
